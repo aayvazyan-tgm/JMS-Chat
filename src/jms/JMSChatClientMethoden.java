@@ -1,4 +1,4 @@
-package jms;
+package mair;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -37,17 +37,19 @@ public class JMSChatClientMethoden {
 		this.user = user;
 	}
 
-	public void createConsumer(){
+	public MessageConsumer createConsumer(Session session, Destination destination){
 		try{
 			// Create the consumer
 			consumer = session.createConsumer( destination );
+			return consumer;
 		}
 		catch(JMSException jmse){
 			System.out.println("Fehler bei dem Consumer!");
+			return null;
 		}
 
 	}		
-	public void recieveMessage(){
+	public void recieveMessage(MessageConsumer consumer){
 		try{
 			// Start receiving
 			TextMessage message = (TextMessage) consumer.receive();
@@ -61,46 +63,60 @@ public class JMSChatClientMethoden {
 		}
 
 	}
-	public void createConnection(String user, String url){
+	public Connection createConnection(){
 		try{
-			ConnectionFactory connectionFactory = new ActiveMQConnectionFactory( user, null, url );
+			ConnectionFactory connectionFactory = new ActiveMQConnectionFactory( this.user, null, this.url );
 			connection = connectionFactory.createConnection();
 			connection.start();
+			return connection;
 		}
 		catch(JMSException jmse){
 			System.out.println("Fehler beim Verbinden!");
+			return null;
 		}
 	}
 
-	public void createSession(String topic){
+	public Session createSession(Connection connection){
 		try{
 			// Create the session
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-			destination = session.createTopic( topic );
+			return session;
 		}
 		catch(JMSException jmse){
 			System.out.println("Fehler bei der Session!");
+			return null;
 		}
 	}
 
-	public void createProducer(){
+	public Destination createDestination(Session session){
+		try {
+			destination = session.createTopic(this.topic);
+			return destination;
+		} catch (JMSException jmse) {
+			System.out.println("Fehler bei der Destination!");
+			return null;
+		}
+	}
+	
+	public MessageProducer createProducer(Session session, Destination destination){
 		try{
 			// Create the producer.
 			producer = session.createProducer(destination);
 			producer.setDeliveryMode( DeliveryMode.NON_PERSISTENT );
+			return producer;
 		}
 		catch(JMSException jmse){
 			System.out.println("Fehler bei dem Producer!");
+			return null;
 		}
 	}
 
-	public void sendMessage(String msg){
+	public void sendMessage(Session session, MessageProducer producer, String msg){
 		try{
 			// Create the message
 			TextMessage message = session.createTextMessage( user+"["+InetAddress.getLocalHost().getHostAddress()+"]: "+msg);
 			producer.send(message);
 			System.out.println( message.getText() );
-			connection.stop();
 		}
 		catch(JMSException jmse){
 			System.out.println("Fehler beim Senden der Message!");
@@ -108,13 +124,4 @@ public class JMSChatClientMethoden {
 			System.out.println("Unbekannter Host");
 		}
 	}
-
-
-	public void closeAll(){
-		try { producer.close(); } catch ( Exception e ) {System.out.println("Fehler beim Beenden vom Producer");}
-		try { consumer.close(); } catch ( Exception e ) {System.out.println("Fehler beim Beenden vom Consumer");}
-		try { session.close(); } catch ( Exception e ) {System.out.println("Fehler beim Beenden von der Session");}
-		try { connection.close(); } catch ( Exception e ) {System.out.println("Fehler beim Beenden von der Connection");}
-	}	
-
 }
