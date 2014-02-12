@@ -19,11 +19,14 @@ import javax.swing.JComboBox;
 
 
 /**
- * The Class ConfigDialog.
+ * @author Ari Ayvazyan
+ * @version 12.02.2014
+ * 
+ * This jdialog uses the input parameters and lets the user see and change them.
+ * ConfigDialog is blocking until the user closes the window!
+ * 
  */
 public class ConfigDialog extends JDialog {
-	/** the combo Box to select the Database System*/
-	public JComboBox comboBox;
 	/** The content panel. */
 	private final JPanel contentPanel = new JPanel();
 	
@@ -36,18 +39,13 @@ public class ConfigDialog extends JDialog {
 	/** The txt Topic. */
 	public JTextField txtTopic;
 
-
-	public static void main (String args[]){
-		new ConfigDialog("","","","").setVisible(true);
-	}
-
 	
 	
 	/**
-	 * Erstellt einen dialog
-	 *
+     *  This jdialog uses the input parameters and lets the user see and change them.
+     *  ConfigDialog is blocking until the user closes the window!
 	 */
-	public ConfigDialog(String user,String Topic,String datenbank, String server) {
+	public ConfigDialog(String user,String Topic, String server) {
 		setResizable(false);
 		setBounds(100, 100, 300, 280);
 		getContentPane().setLayout(new BorderLayout());
