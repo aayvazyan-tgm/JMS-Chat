@@ -88,16 +88,16 @@ public class JMSChatClientMethoden {
 		}
 	}
 
-	public Destination createDestination(Session session){
+	public Destination createDestinationTopic(Session session){
 		try {
 			destination = session.createTopic(this.topic);
 			return destination;
 		} catch (JMSException jmse) {
-			System.out.println("Fehler bei der Destination!");
+			System.out.println("Fehler bei der TopicDestination!");
 			return null;
 		}
 	}
-	
+
 	public MessageProducer createProducer(Session session, Destination destination){
 		try{
 			// Create the producer.
@@ -111,12 +111,45 @@ public class JMSChatClientMethoden {
 		}
 	}
 
+	public Destination createPrivateDestination(Session session, String destIP){
+		try {
+			destination = session.createQueue(destIP);
+			return destination;
+		} catch (JMSException jmse) {
+			System.out.println("Fehler bei der PrivateDestination!");
+			return null;
+		}
+	}
+
+	public void privateMessage(Session session, String destIP, String msg){
+		TextMessage message = null;
+		try {
+			message = session.createTextMessage( user+"["+InetAddress.getLocalHost().getHostAddress()+"] whispered: "+msg);
+			Destination pdest = this.createPrivateDestination(session, destIP);
+			this.createProducer(session, pdest).send(message);
+
+		} catch (JMSException jmse) {
+			System.out.println("Fehler bei der PrivateMessage");
+		}
+		catch (UnknownHostException uhe){
+			System.out.println("Unbekannter Host");
+		}
+	}
+
 	public void sendMessage(Session session, MessageProducer producer, String msg){
 		try{
-			// Create the message
-			TextMessage message = session.createTextMessage( user+"["+InetAddress.getLocalHost().getHostAddress()+"]: "+msg);
-			producer.send(message);
-			System.out.println( message.getText() );
+			if(msg.split(" ")[0].equals(Command._MAIL.toString())){
+				if(msg.split(" ")[1].split(".").length == 4)
+					this.privateMessage(session, msg.split(" ")[1], msg);
+				else
+					System.out.println("Falsche Empfaenger Eingabe!");
+			}
+			else{
+				// Create the message
+				TextMessage message = session.createTextMessage( user+"["+InetAddress.getLocalHost().getHostAddress()+"]: "+msg);
+				producer.send(message);
+				System.out.println( message.getText() );
+			}
 		}
 		catch(JMSException jmse){
 			System.out.println("Fehler beim Senden der Message!");
