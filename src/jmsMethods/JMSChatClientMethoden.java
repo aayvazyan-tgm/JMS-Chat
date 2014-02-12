@@ -16,7 +16,6 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
-import jms.Command;
 import jms.Debug;
 
 // TODO: Auto-generated Javadoc
@@ -79,8 +78,8 @@ public class JMSChatClientMethoden {
 			return consumer;
 		}
 		catch(JMSException jmse){
-			if(Debug.debug==true){ jmse.printStackTrace(); }
 			System.out.println("Fehler bei dem Consumer!");
+			if(Debug.debug){jmse.printStackTrace();}
 			return null;
 		}
 
@@ -101,8 +100,8 @@ public class JMSChatClientMethoden {
 			}
 		}
 		catch(JMSException jmse){
-			if(Debug.debug==true){ jmse.printStackTrace(); }
 			System.out.println("Fehler beim Empfangen!");
+			if(Debug.debug){jmse.printStackTrace();}
 		}
 
 	}
@@ -120,8 +119,8 @@ public class JMSChatClientMethoden {
 			return connection;
 		}
 		catch(JMSException jmse){
-			if(Debug.debug==true){ jmse.printStackTrace(); }
 			System.out.println("Fehler beim Verbinden!");
+			if(Debug.debug){jmse.printStackTrace();}
 			return null;
 		}
 	}
@@ -139,8 +138,8 @@ public class JMSChatClientMethoden {
 			return session;
 		}
 		catch(JMSException jmse){
-			if(Debug.debug==true){ jmse.printStackTrace(); }
 			System.out.println("Fehler bei der Session!");
+			if(Debug.debug){jmse.printStackTrace();}
 			return null;
 		}
 	}
@@ -156,8 +155,8 @@ public class JMSChatClientMethoden {
 			destination = session.createTopic(this.topic);
 			return destination;
 		} catch (JMSException jmse) {
-			if(Debug.debug==true){ jmse.printStackTrace(); }
 			System.out.println("Fehler bei der TopicDestination!");
+			if(Debug.debug){jmse.printStackTrace();}
 			return null;
 		}
 	}
@@ -178,6 +177,7 @@ public class JMSChatClientMethoden {
 		}
 		catch(JMSException jmse){
 			System.out.println("Fehler bei dem Producer!");
+			if(Debug.debug){jmse.printStackTrace();}
 			return null;
 		}
 	}
@@ -195,7 +195,7 @@ public class JMSChatClientMethoden {
 			return destination;
 		} catch (JMSException jmse) {
 			System.out.println("Fehler bei der PrivateDestination!");
-			if(Debug.debug==true){ jmse.printStackTrace(); }
+			if(Debug.debug){jmse.printStackTrace();}
 			return null;
 		}
 	}
@@ -215,41 +215,133 @@ public class JMSChatClientMethoden {
 			this.createProducer(session, pdest).send(message);
 
 		} catch (JMSException jmse) {
-			if(Debug.debug==true){ jmse.printStackTrace(); }
 			System.out.println("Fehler bei der PrivateMessage");
+			if(Debug.debug){jmse.printStackTrace();}
 		}
 		catch (UnknownHostException uhe){
-			if(Debug.debug==true){ uhe.printStackTrace(); }
 			System.out.println("Unbekannter Host");
+			if(Debug.debug){uhe.printStackTrace();}
+		}
+	}
+
+	/**
+	 * Help message.
+	 */
+	public void helpMessage(){
+		for(Command c : Command.values()){
+			System.out.println(c.getHilfstext());
+		}
+	}
+
+	/**
+	 * Read mail.
+	 *
+	 * @param session the session
+	 */
+	public void readMail(Session session){
+		try{
+			//Erstellen deiner home destination
+			Destination home = this.createPrivateDestination(session, InetAddress.getLocalHost().getHostAddress());
+			
+			TextMessage message = (TextMessage) this.createConsumer(session, home).receive();
+
+			if ( message != null ) {
+				System.out.println("Message received: " + message.getText() );
+				message.acknowledge();
+			}
+		}
+		catch(JMSException jmse){
+			System.out.println("Fehler beim Empfangen!");
+			if(Debug.debug){jmse.printStackTrace();}
+		} catch (UnknownHostException e) {
+			System.out.println("Fehler du hast keine IP?");
+		}
+	}
+
+	/**
+	 * Use commands.
+	 *
+	 * @param connection the connection
+	 * @param session the session
+	 * @param consumer the consumer
+	 * @param producer the producer
+	 * @param msg the msg
+	 */
+	public void useCommands(Connection connection, Session session, MessageConsumer consumer, MessageProducer producer, String msg){
+		String[] splitMsg = msg.replace("/", "").split(" ");
+
+		switch(Command.valueOf(splitMsg[0])){
+		case MAIL : 
+
+			if(splitMsg[1].split(".").length == 4)
+				this.privateMessage(session, splitMsg[1], msg);
+			else
+				System.out.println("Falsche Empfaenger Eingabe!");
+			break;
+
+
+		case HELP :
+			this.helpMessage();
+			break;
+
+		case MAILBOX : 
+			this.readMail(session);
+			break;
+		
+		
+		case EXIT :
+			this.closeAll(connection, session, consumer, producer);
+			break;
+			
+		default : 
+			System.out.println("Unbekannter Befehl!");
 		}
 	}
 
 	/**
 	 * Send message.
 	 *
+	 * @param connection the connection
 	 * @param session the session
+	 * @param consumer the consumer
 	 * @param producer the producer
 	 * @param msg the msg
 	 */
-	public void sendMessage(Session session, MessageProducer producer, String msg){
+	public void sendMessage(Connection connection, Session session, MessageConsumer consumer, MessageProducer producer, String msg){
 		try{
-			if(msg.split(" ")[0].equals(Command._MAIL.toString())){
-				if(msg.split(" ")[1].split(".").length == 4)
-					this.privateMessage(session, msg.split(" ")[1], msg);
-				else
-					System.out.println("Falsche Empfaenger Eingabe!");
+			if(msg.charAt(0) == '/'){
+				this.useCommands(connection, session, consumer, producer, msg);
 			}
+
+
 			else{
 				// Create the message
 				TextMessage message = session.createTextMessage( user+"["+InetAddress.getLocalHost().getHostAddress()+"]: "+msg);
 				producer.send(message);
-				System.out.println( message.getText() );
+				System.out.println( message.getText());
 			}
 		}
 		catch(JMSException jmse){
 			System.out.println("Fehler beim Senden der Message!");
+			if(Debug.debug){jmse.printStackTrace();}
 		} catch (UnknownHostException uhe) {
 			System.out.println("Unbekannter Host");
+			if(Debug.debug){uhe.printStackTrace();}
 		}
+	}
+	
+	/**
+	 * Close all.
+	 *
+	 * @param connection the connection
+	 * @param session the session
+	 * @param consumer the consumer
+	 * @param producer the producer
+	 */
+	public void closeAll(Connection connection, Session session, MessageConsumer consumer, MessageProducer producer){
+		try {producer.close();} catch (JMSException e) {System.out.println("Fehler beim beenden vom producer");}
+		try {consumer.close();} catch (JMSException e) {System.out.println("Fehler beim beenden vom consumer");}
+		try {session.close();} catch (JMSException e) {System.out.println("Fehler beim beenden von der session");}
+		try {connection.close();} catch (JMSException e) {System.out.println("Fehler beim beenden von der connection");}
 	}
 }
