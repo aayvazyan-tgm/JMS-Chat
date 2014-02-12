@@ -30,7 +30,7 @@ public class MyCommandLineParser {
 	 * @param args - Die zu parsende Argumente.
 	 * @throws OptionException the option exception
 	 */
-	public MyCommandLineParser(String[] args) throws OptionException{
+	public MyCommandLineParser(String[] args) {
 
 		DefaultOptionBuilder obuilder = new DefaultOptionBuilder();
 		ArgumentBuilder abuilder = new ArgumentBuilder();
@@ -62,12 +62,12 @@ public class MyCommandLineParser {
 		parser.setHelpFormatter(hf);
 		parser.setHelpTrigger("-h");
 		parser.setGroup(options);
-		
+		try{
 		//verarbeiten der argumente
-		CommandLine cl = parser.parse(args);
+			CommandLine cl = parser.parse(args);
 		
 		//auslesen der argumente
-		try{
+		
 			if(cl.hasOption(serverOption)) {
 			server = (String) cl.getValue(serverOption);
 			}
@@ -79,7 +79,7 @@ public class MyCommandLineParser {
 			}
 		}catch(Exception e){
 			hf.printHelp();
-			e.printStackTrace();
+			if(Debug.debug==true){ e.printStackTrace(); }
 		}
 	}
 	
