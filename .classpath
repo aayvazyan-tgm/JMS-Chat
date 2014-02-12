@@ -2,9 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="lib/activemq-all-5.8.0.jar"/>
-	<classpathentry kind="lib" path="lib/commons-cli-2.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Wolfgang/Desktop/DER Ordner/Schule/TGM/4.Klasse/SEW/Libraries/activemq-all-5.9.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Wolfgang/Desktop/DER Ordner/Schule/TGM/4.Klasse/SEW/Libraries/commons-cli-2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-cli-2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
