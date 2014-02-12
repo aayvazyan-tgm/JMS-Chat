@@ -1,4 +1,4 @@
-package jms;
+package GUIElements;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 

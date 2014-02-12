@@ -1,5 +1,7 @@
 package jms;
 
+import GUIElements.ConfigDialog;
+
 
 /**
  * This class handles the program start and works as its backbone
