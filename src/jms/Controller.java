@@ -17,6 +17,8 @@ public class Controller {
 		//let the user check the arguments in a GUI
 		ConfigDialog cf=new ConfigDialog(mp.benutzername, mp.topic, mp.server);
 		
+		//start the connection and GUI
+		
 		
 		
 	}
