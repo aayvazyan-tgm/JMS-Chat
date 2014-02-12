@@ -1,4 +1,4 @@
-package jms;
+package jmsMethods;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -15,6 +15,9 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
+
+import jms.Command;
+import jms.Debug;
 
 // TODO: Auto-generated Javadoc
 /**

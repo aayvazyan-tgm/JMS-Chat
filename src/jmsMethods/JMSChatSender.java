@@ -1,20 +1,25 @@
-package jms;
+package jmsMethods;
+
+import java.net.InetAddress;
 
 import org.apache.activemq.ActiveMQConnection;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
+import javax.jms.DeliveryMode;
 import javax.jms.Destination;
-import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+import jms.Debug;
+
 // TODO: Auto-generated Javadoc
 /**
- * The Class JMSChatReceiver.
+ * The Class JMSChatSender.
  */
-public class JMSChatReceiver {
+public class JMSChatSender {
 
   /** The user. */
   private static String user = ActiveMQConnection.DEFAULT_USER;
@@ -38,12 +43,12 @@ public class JMSChatReceiver {
 	  // Create the connection.
 	  Session session = null;
 	  Connection connection = null;
-	  MessageConsumer consumer = null;
+	  MessageProducer producer = null;
 	  Destination destination = null;
 			
 	  try {
 	    	
-			ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(user, password, url);
+			ConnectionFactory connectionFactory = new ActiveMQConnectionFactory( user, password, url );
 			connection = connectionFactory.createConnection();
 			connection.start();
 		
@@ -51,31 +56,29 @@ public class JMSChatReceiver {
 			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 			destination = session.createTopic( subject );
 				  
-			// Create the consumer
-			consumer = session.createConsumer( destination );
-				
-			// Start receiving
-			TextMessage message = (TextMessage) consumer.receive();
-      if ( message != null ) {
-      	System.out.println("Message received: " + message.getText() );
-      	message.acknowledge();
-      }
-      connection.stop();
+			// Create the producer.
+			producer = session.createProducer(destination);
+			producer.setDeliveryMode( DeliveryMode.NON_PERSISTENT );
 			
+			// Create the message
+			TextMessage message = session.createTextMessage( "MaxMustermann [ "+InetAddress.getLocalHost().getHostAddress()+" ]: This message was sent at (ms): " + System.currentTimeMillis() );
+			producer.send(message);
+			System.out.println( message.getText() );
+			connection.stop();
+	      
 	  } catch (Exception e) {
 	  	
-	    System.out.println("[MessageConsumer] Something went wrong at receiving. : " + e);
-	    if(Debug.debug==true){ e.printStackTrace(); }
-	      
+	  	System.out.println("[MessageProducer] A Error occured trying to send a message: " + e);
+	  	if(Debug.debug==true){ e.printStackTrace(); }
+	  	
 	  } finally {
 	  	
-			try { consumer.close(); } catch ( Exception e ) {}
+			try { producer.close(); } catch ( Exception e ) {}
 			try { session.close(); } catch ( Exception e ) {}
 			try { connection.close(); } catch ( Exception e ) {}
 			
 	  }
-
-  } // end main
       
-}
+  } // end main
 	
+}
