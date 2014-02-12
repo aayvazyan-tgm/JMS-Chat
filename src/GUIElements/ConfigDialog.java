@@ -46,30 +46,23 @@ public class ConfigDialog extends JDialog {
      *  ConfigDialog is blocking until the user closes the window!
 	 */
 	public ConfigDialog(String user,String Topic, String server) {
+		setModal(true);
 		setResizable(false);
-		setBounds(100, 100, 300, 280);
+		setBounds(100, 100, 300, 200);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		JPanel panel = new JPanel();
 		panel.setBorder(new TitledBorder(null, "Server", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		JPanel panel_1 = new JPanel();
-		panel_1.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Datenbank", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		panel_1.setLayout(new BorderLayout(0, 0));
 		JPanel panel_4 = new JPanel();
-		
-		JPanel panel_5 = new JPanel();
-		panel_5.setBorder(new TitledBorder(null, "", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		GroupLayout gl_contentPanel = new GroupLayout(contentPanel);
 		gl_contentPanel.setHorizontalGroup(
 			gl_contentPanel.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_contentPanel.createSequentialGroup()
 					.addContainerGap()
-					.addGroup(gl_contentPanel.createParallelGroup(Alignment.TRAILING)
-						.addComponent(panel_5, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
-						.addComponent(panel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
-						.addComponent(panel_4, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
-						.addComponent(panel_1, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE))
+					.addGroup(gl_contentPanel.createParallelGroup(Alignment.LEADING)
+						.addComponent(panel, GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE)
+						.addComponent(panel_4, GroupLayout.DEFAULT_SIZE, 264, Short.MAX_VALUE))
 					.addContainerGap())
 		);
 		gl_contentPanel.setVerticalGroup(
@@ -77,13 +70,9 @@ public class ConfigDialog extends JDialog {
 				.addGroup(gl_contentPanel.createSequentialGroup()
 					.addContainerGap()
 					.addComponent(panel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
-					.addComponent(panel_1, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(panel_4, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(panel_5, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(63, Short.MAX_VALUE))
+					.addContainerGap(105, Short.MAX_VALUE))
 		);
 		
 		panel_4.setLayout(new GridLayout(0, 2, 0, 0));

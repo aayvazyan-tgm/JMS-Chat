@@ -17,6 +17,7 @@ import javax.jms.Session;
 import javax.jms.TextMessage;
 
 import jms.Debug;
+import jms.WatchdogReadChat;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -32,7 +33,9 @@ public class JMSChatClientMethoden {
 	
 	/** The url. */
 	private final String url;
-
+	
+	/** The Watchdog*/
+	private WatchdogReadChat watchDog;
 
 	// Create the connection.
 	/** The session. */
@@ -52,11 +55,11 @@ public class JMSChatClientMethoden {
 
 
 	/**
-	 * Instantiates a new jMS chat client methoden.
+	 * Ein Konstruktor der die Methoden für den JMS Chat benutzbar macht
 	 *
-	 * @param server the server
-	 * @param user the user
-	 * @param topic the topic
+	 * @param server the server on which activemq is running
+	 * @param user The name of the user
+	 * @param topic The Chatroom
 	 */
 	public JMSChatClientMethoden(String server, String user, String topic){
 		this.url = "failover://tcp://"+server;
@@ -65,11 +68,11 @@ public class JMSChatClientMethoden {
 	}
 
 	/**
-	 * Creates the consumer.
+	 * Creates the consumer which is able to recieve Messages.
 	 *
-	 * @param session the session
-	 * @param destination the destination
-	 * @return the message consumer
+	 * @param session The session of the User
+	 * @param destination The Destination definded by the chatroom
+	 * @return   A message consumer which is able to recieve messages from the Chatroom
 	 */
 	public MessageConsumer createConsumer(Session session, Destination destination){
 		try{
@@ -86,30 +89,33 @@ public class JMSChatClientMethoden {
 	}		
 	
 	/**
-	 * Recieve message.
+	 * A Method which waits until it recieves a Message from a Chatroom to print.
 	 *
 	 * @param consumer the consumer
 	 */
-	public void recieveMessage(MessageConsumer consumer){
+	public String recieveMessage(MessageConsumer consumer){
+		String text = "";
 		try{
 			// Start receiving
 			TextMessage message = (TextMessage) consumer.receive();
 			if ( message != null ) {
-				System.out.println("Message received: " + message.getText() );
+				text = message.getText();
 				message.acknowledge();
 			}
+			return text;
 		}
 		catch(JMSException jmse){
 			System.out.println("Fehler beim Empfangen!");
 			if(Debug.debug){jmse.printStackTrace();}
+			return text;
 		}
 
 	}
 	
 	/**
-	 * Creates the connection.
+	 * A Method which Creates the connection between the user and the Server with the activemq running.
 	 *
-	 * @return the connection
+	 * @return   the connection 
 	 */
 	public Connection createConnection(){
 		try{
@@ -126,7 +132,7 @@ public class JMSChatClientMethoden {
 	}
 
 	/**
-	 * Creates the session.
+	 * Creates the session based on the Connection.
 	 *
 	 * @param connection the connection
 	 * @return the session
@@ -145,10 +151,10 @@ public class JMSChatClientMethoden {
 	}
 
 	/**
-	 * Creates the destination topic.
+	 * Creates the destination topic wich is defined by the chatroom name and the session.
 	 *
 	 * @param session the session
-	 * @return the destination
+	 * @return   the destination
 	 */
 	public Destination createDestinationTopic(Session session){
 		try {
@@ -162,7 +168,7 @@ public class JMSChatClientMethoden {
 	}
 
 	/**
-	 * Creates the producer.
+	 * Creates the producer which is able to write Messages towards the destination he was created with.
 	 *
 	 * @param session the session
 	 * @param destination the destination
@@ -183,7 +189,7 @@ public class JMSChatClientMethoden {
 	}
 
 	/**
-	 * Creates the private destination.
+	 * Creates the private destination which is the Mailbox of a User.
 	 *
 	 * @param session the session
 	 * @param destIP the dest ip
@@ -201,7 +207,7 @@ public class JMSChatClientMethoden {
 	}
 
 	/**
-	 * Private message.
+	 * Sends a Private message to a User.
 	 *
 	 * @param session the session
 	 * @param destIP the dest ip
@@ -212,8 +218,12 @@ public class JMSChatClientMethoden {
 		try {
 			message = session.createTextMessage( user+"["+InetAddress.getLocalHost().getHostAddress()+"] whispered: "+msg);
 			Destination pdest = this.createPrivateDestination(session, destIP);
-			this.createProducer(session, pdest).send(message);
-
+			
+			MessageProducer pro = this.createProducer(session, pdest);
+			pro.send(message);
+			
+			pro.close();
+			
 		} catch (JMSException jmse) {
 			System.out.println("Fehler bei der PrivateMessage");
 			if(Debug.debug){jmse.printStackTrace();}
@@ -225,41 +235,51 @@ public class JMSChatClientMethoden {
 	}
 
 	/**
-	 * Help message.
+	 * A Method which shows you Help message of every command.
 	 */
-	public void helpMessage(){
+	public String helpMessage(){
+		String text = "";
 		for(Command c : Command.values()){
-			System.out.println(c.getHilfstext());
+			text += c.getHilfstext();
+			text += "\n";
 		}
+		return text;
 	}
 
 	/**
-	 * Read mail.
+	 * A Method which allows you to read your own Mailbox.
 	 *
 	 * @param session the session
 	 */
-	public void readMail(Session session){
+	public String readMail(Session session){
+		String text = "";
 		try{
 			//Erstellen deiner home destination
 			Destination home = this.createPrivateDestination(session, InetAddress.getLocalHost().getHostAddress());
 			
-			TextMessage message = (TextMessage) this.createConsumer(session, home).receive();
+			MessageConsumer cons = this.createConsumer(session, home);
+			
+			TextMessage message = (TextMessage) cons.receive();
 
 			if ( message != null ) {
-				System.out.println("Message received: " + message.getText() );
+				text = message.getText();
 				message.acknowledge();
 			}
+			cons.close();
+			return text;
 		}
 		catch(JMSException jmse){
 			System.out.println("Fehler beim Empfangen!");
 			if(Debug.debug){jmse.printStackTrace();}
+			return text;
 		} catch (UnknownHostException e) {
 			System.out.println("Fehler du hast keine IP?");
+			return text;
 		}
 	}
 
 	/**
-	 * Use commands.
+	 * A Method which recognizes which command was used and launches the right method.
 	 *
 	 * @param connection the connection
 	 * @param session the session
@@ -299,7 +319,7 @@ public class JMSChatClientMethoden {
 	}
 
 	/**
-	 * Send message.
+	 * A Method which allows you to send a text into a Chatroom.
 	 *
 	 * @param connection the connection
 	 * @param session the session
@@ -312,7 +332,6 @@ public class JMSChatClientMethoden {
 			if(msg.charAt(0) == '/'){
 				this.useCommands(connection, session, consumer, producer, msg);
 			}
-
 
 			else{
 				// Create the message
@@ -331,7 +350,7 @@ public class JMSChatClientMethoden {
 	}
 	
 	/**
-	 * Close all.
+	 * A Method which closes the Connection, session, producer and the consumer.
 	 *
 	 * @param connection the connection
 	 * @param session the session
@@ -339,9 +358,15 @@ public class JMSChatClientMethoden {
 	 * @param producer the producer
 	 */
 	public void closeAll(Connection connection, Session session, MessageConsumer consumer, MessageProducer producer){
-		try {producer.close();} catch (JMSException e) {System.out.println("Fehler beim beenden vom producer");}
-		try {consumer.close();} catch (JMSException e) {System.out.println("Fehler beim beenden vom consumer");}
-		try {session.close();} catch (JMSException e) {System.out.println("Fehler beim beenden von der session");}
-		try {connection.close();} catch (JMSException e) {System.out.println("Fehler beim beenden von der connection");}
+		this.watchDog.stopThread();
+		try {if(producer != null)producer.close();} catch (JMSException e) {System.out.println("Fehler beim beenden vom producer");}
+		try {if(consumer != null)consumer.close();} catch (JMSException e) {System.out.println("Fehler beim beenden vom consumer");}
+		try {if(session != null)session.close();} catch (JMSException e) {System.out.println("Fehler beim beenden von der session");}
+		try {if(connection != null)connection.close();} catch (JMSException e) {System.out.println("Fehler beim beenden von der connection");}
+	}
+
+	public void setWatchdog(WatchdogReadChat watchDog) {
+		this.watchDog=watchDog;
+		
 	}
 }
