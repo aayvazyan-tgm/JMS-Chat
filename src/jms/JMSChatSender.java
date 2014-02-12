@@ -13,13 +13,29 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class JMSChatSender.
+ */
 public class JMSChatSender {
 
+  /** The user. */
   private static String user = ActiveMQConnection.DEFAULT_USER;
+  
+  /** The password. */
   private static String password = ActiveMQConnection.DEFAULT_PASSWORD;
+  
+  /** The url. */
   private static String url = ActiveMQConnection.DEFAULT_BROKER_URL;
+  
+  /** The subject. */
   private static String subject = "VSDBChat";
 	
+  /**
+   * The main method.
+   *
+   * @param args the arguments
+   */
   public static void main( String[] args ) {
 		
 	  // Create the connection.
@@ -50,8 +66,8 @@ public class JMSChatSender {
 	      
 	  } catch (Exception e) {
 	  	
-	  	System.out.println("[MessageProducer] Caught: " + e);
-	  	e.printStackTrace();
+	  	System.out.println("[MessageProducer] A Error occured trying to send a message: " + e);
+	  	if(Debug.debug==true){ e.printStackTrace(); }
 	  	
 	  } finally {
 	  	

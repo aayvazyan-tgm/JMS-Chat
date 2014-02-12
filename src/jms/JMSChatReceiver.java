@@ -10,13 +10,29 @@ import javax.jms.MessageConsumer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class JMSChatReceiver.
+ */
 public class JMSChatReceiver {
 
+  /** The user. */
   private static String user = ActiveMQConnection.DEFAULT_USER;
+  
+  /** The password. */
   private static String password = ActiveMQConnection.DEFAULT_PASSWORD;
+  
+  /** The url. */
   private static String url = ActiveMQConnection.DEFAULT_BROKER_URL;
+  
+  /** The subject. */
   private static String subject = "VSDBChat";
 	
+  /**
+   * The main method.
+   *
+   * @param args the arguments
+   */
   public static void main( String[] args ) {
 		
 	  // Create the connection.
@@ -48,8 +64,8 @@ public class JMSChatReceiver {
 			
 	  } catch (Exception e) {
 	  	
-	    System.out.println("[MessageConsumer] Caught: " + e);
-	    e.printStackTrace();
+	    System.out.println("[MessageConsumer] Something went wrong at receiving. : " + e);
+	    if(Debug.debug==true){ e.printStackTrace(); }
 	      
 	  } finally {
 	  	
