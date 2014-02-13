@@ -19,9 +19,9 @@ import javax.jms.TextMessage;
 
 import jms.Debug;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class JMSChatClientMethoden.
+ * The Class JMSChatClientMethoden enables useful Methods like sending messages to 
+ * an activemq server or using Commands.
  */
 public class JMSChatClientMethoden {
 
@@ -268,12 +268,18 @@ public class JMSChatClientMethoden {
 	 */
 	public void useCommands(Connection connection, Session session, MessageConsumer consumer, MessageProducer producer, String msg){
 		String[] splitMsg = msg.replace("/", "").split(" ");
-
-		switch(Command.valueOf(splitMsg[0])){
+		
+		if(Debug.debug)System.out.println("Ausführen des Commands : "+Command.valueOf(splitMsg[0].toUpperCase()));
+		
+		switch(Command.valueOf(splitMsg[0].toUpperCase())){
 		case MAIL : 
 
-			if(splitMsg[1].split(".").length == 4)
-				this.privateMessage(session, splitMsg[1], msg);
+			if(splitMsg.length >= 3){
+				if(splitMsg[1].split(".").length == 4)
+					this.privateMessage(session, splitMsg[1], msg);
+				else
+					System.out.println("Falsche Empfaenger Eingabe!");
+			}
 			else
 				System.out.println("Falsche Empfaenger Eingabe!");
 			break;
@@ -281,6 +287,7 @@ public class JMSChatClientMethoden {
 
 		case HELP :
 			this.helpMessage();
+			System.out.println(this.helpMessage());
 			break;
 
 		case MAILBOX : 
@@ -289,7 +296,9 @@ public class JMSChatClientMethoden {
 		
 		
 		case EXIT :
+			
 			this.closeAll(connection, session, consumer, producer);
+			System.exit(0);
 			break;
 			
 		default : 

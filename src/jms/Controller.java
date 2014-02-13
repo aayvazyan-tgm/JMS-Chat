@@ -16,7 +16,7 @@ import GUIElements.ConfigDialog;
  */
 public class Controller {
 	public static void main(String[] args){
-		System.out.println("Debug mode: "+Debug.debug);
+		if(Debug.debug)System.out.println("Debug mode: "+Debug.debug);
 		
 		//process the arguments
 		MyCommandLineParser mp= new MyCommandLineParser(args);

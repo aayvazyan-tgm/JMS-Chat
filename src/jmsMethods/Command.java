@@ -6,16 +6,16 @@ package jmsMethods;
  */
 public enum Command {
 	/**The Help Command which shows you all commands*/
-	HELP("/Help\tGibt die Commandos aus!"), 
+	HELP("/Help\t\t\t\t\tGibt die Commandos aus!"), 
 	
 	/**The Mail command which allows you to send a private message to another user*/
 	MAIL("/Mail <ip_des_benutzers> <nachricht>\tSendet eine Nachricht einen bestimmten Benutzer!"),
 	
 	/**The Mailbox command which allows you to read your private messages */
-	MAILBOX("/Mailbox\tLiest deine Mailbox Nachricht!"),
+	MAILBOX("/Mailbox\t\t\t\tLiest deine Mailbox Nachricht!"),
 	
 	/**The Exit command which allows you to close the program*/
-	EXIT("/Exit\tBeendet den Chat!");
+	EXIT("/Exit\t\t\t\t\tBeendet den Chat!");
 	
 	//Attribute
 	private String text;
