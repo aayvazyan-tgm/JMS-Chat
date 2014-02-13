@@ -50,7 +50,7 @@ public class ReadChat implements MessageListener{
             try {
             	if(message != null){
             		chat.addListEntry(((TextMessage) message).getText());
-            		System.out.println(((TextMessage) message).getText());
+            		if(Debug.debug){System.out.println(((TextMessage) message).getText());}
             	}
             }
             catch (Exception e) {

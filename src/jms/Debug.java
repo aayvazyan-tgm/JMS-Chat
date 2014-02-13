@@ -8,5 +8,5 @@ package jms;
  * 
  */
 public class Debug {
-	public static boolean debug=true; 
+	public static boolean debug=false; 
 }

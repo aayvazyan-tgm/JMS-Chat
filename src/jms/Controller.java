@@ -31,7 +31,7 @@ public class Controller {
 		//Start the GUI
 		ChatterView chatV = new ChatterView(new TextHandler(methodClass));
 		chatV.setVisible(true);
-		
+		methodClass.setChatterView(chatV);
 		//start the receiver thread
 		ReadChat readChat = new ReadChat(methodClass,chatV);
 		TextReader reader = new TextReader(readChat,methodClass);
