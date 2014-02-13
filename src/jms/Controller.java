@@ -33,14 +33,8 @@ public class Controller {
 		chatV.setVisible(true);
 		
 		//start the receiver thread
-		ReadChat readChatRunnable = new ReadChat(methodClass,chatV);
-		WatchdogReadChat watchDog=new WatchdogReadChat(chatV,readChatRunnable);
-		//set the watchdog for the method!!
-		methodClass.setWatchdog(watchDog);
-		
-		Thread t= new Thread(readChatRunnable);
-		t.start();
-		
+		ReadChat readChat = new ReadChat(methodClass,chatV);
+		TextReader reader = new TextReader(readChat,methodClass);
 		
 	}
 }

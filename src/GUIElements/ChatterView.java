@@ -40,9 +40,12 @@ public class ChatterView extends JFrame {
 	
 	/** contains all elements to show to the user. */
 	private Vector<String> vec=new Vector<String>();
+	
 	/** processes the Text */
 	private TextProcesser tp;
 	
+	/** the scrollPane that contains the chatlog*/
+	JScrollPane scrollPane;
 	/**
 	 * Create the frame.
 	 */
@@ -74,7 +77,7 @@ public class ChatterView extends JFrame {
 			}
 		});
 		
-		JScrollPane scrollPane = new JScrollPane();
+		scrollPane = new JScrollPane();
 		GroupLayout gl_contentPane = new GroupLayout(contentPane);
 		gl_contentPane.setHorizontalGroup(
 			gl_contentPane.createParallelGroup(Alignment.LEADING)
@@ -111,8 +114,9 @@ public class ChatterView extends JFrame {
 	 * @param entry the entry to add
 	 */
 	synchronized public void addListEntry(String entry){
-		this.vec.add(0, entry);
+		this.vec.add(entry);
 		this.list.setListData(vec);
+		this.list.setSelectedIndex(vec.size());
 		}
 	/**
 	 * Sends the Text from the input box to the topic

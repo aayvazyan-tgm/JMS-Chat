@@ -2,20 +2,23 @@ package jms;
 
 import javax.jms.Connection;
 import javax.jms.Destination;
+import javax.jms.Message;
 import javax.jms.MessageConsumer;
+import javax.jms.MessageListener;
 import javax.jms.Session;
+import javax.jms.TextMessage;
 
 import GUIElements.ChatterView;
 
 import jmsMethods.JMSChatClientMethoden;
 
 /**
- * A thread which never stops to read the chat after he connected
+ * A Class which starts a method when a message is send to the chat after he connected
  * 
  * @author Wolfgang Mair
- * @version 2014-02-12
+ * @version 2014-02-13
  */
-public class ReadChat implements Runnable{
+public class ReadChat implements MessageListener{
 
 	//Attribute
 	private JMSChatClientMethoden method;
@@ -25,9 +28,9 @@ public class ReadChat implements Runnable{
 	private MessageConsumer consumer;
 	private Destination destination;
 	private boolean go = true;
-	
+
 	/**
-	 * A Constructor which defines the param for the connection
+	 * A Constructor which defines the param for the connection and connects
 	 * 
 	 * @param method The JMSChatClientMethoden Object
 	 * @param chat The GUI
@@ -35,30 +38,26 @@ public class ReadChat implements Runnable{
 	public ReadChat(JMSChatClientMethoden method, ChatterView chat){
 		this.method = method;
 		this.chat = chat;
-	}
-	
-	@Override
-	public void run() {
 		connection = method.createConnection();
 		session = method.createSession(connection);
 		destination = method.createDestinationTopic(session);
 		consumer = method.createConsumer(session, destination);
-		
-		//Never stops until the Watchdogs uses the Method
-		while(go){
-			chat.addListEntry(method.recieveMessage(consumer));
-			
-		}
-		
-		//closes all the creates connections
-		method.closeAll(connection, session, consumer, null);
-		
-	} 
+	}
 	
-	/**
-	 * A Method which stops the Thread
-	 */
-	public void stopRead(){
-		this.go = false;
+	@Override
+	public void onMessage(Message message) {
+	 if (message instanceof TextMessage) {
+            try {
+            	if(message != null){
+            		chat.addListEntry(((TextMessage) message).getText());
+            		System.out.println(((TextMessage) message).getText());
+            	}
+            }
+            catch (Exception e) {
+            	System.out.println("No text message received!");
+                if(Debug.debug)e.printStackTrace();
+            }
+        }
+		
 	}
 }
