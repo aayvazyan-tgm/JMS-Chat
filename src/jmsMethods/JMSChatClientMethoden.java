@@ -292,8 +292,8 @@ public class JMSChatClientMethoden {
 
 			if(splitMsg.length >= 3){
 				if(splitMsg[1].split("\\.").length == 4){
-					for(int i = 3; i < splitMsg.length; i++){
-						messageFinal += splitMsg[i];
+					for(int i = 2; i < splitMsg.length; i++){
+						messageFinal += splitMsg[i]+" ";
 					}
 					this.privateMessage(connection, splitMsg[1], messageFinal);
 				}
